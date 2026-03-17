@@ -1,1 +1,213 @@
-<!DOCTYPE html><html><head><title>VBoarder Mission Control</title></head><body><h1>Loading...</h1></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VBoarder Mission Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;500;700&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080c10;--bg2:#0d1117;--bg3:#111820;--panel:#0f1923;--border:#1e2d3d;--border2:#243447;--accent:#00d4ff;--accent2:#ff6b35;--accent3:#7fff6b;--accent4:#ffd93d;--red:#ff3b3b;--text:#c9d8e8;--text2:#6a8aaa;--text3:#3a5a7a;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Rajdhani',sans-serif;min-height:100vh;}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,212,255,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0;}
+.container{position:relative;z-index:1;max-width:1600px;margin:0 auto;padding:20px;}
+.header{display:flex;align-items:center;justify-content:space-between;padding:20px 30px;border-bottom:1px solid var(--border);margin-bottom:24px;background:linear-gradient(90deg,rgba(0,212,255,0.05),transparent);}
+.logo-v{width:48px;height:48px;background:linear-gradient(135deg,#00d4ff,#0066ff);clip-path:polygon(50% 0%,100% 100%,75% 100%,50% 40%,25% 100%,0% 100%);animation:pulse 3s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.8;filter:brightness(1.3);}}
+.logo-area{display:flex;align-items:center;gap:16px;}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:var(--accent);text-shadow:0 0 20px rgba(0,212,255,0.5);}
+.logo-sub{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text2);letter-spacing:3px;}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--accent3);animation:blink 1.5s ease-in-out infinite;box-shadow:0 0 8px var(--accent3);display:inline-block;margin-right:8px;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.datetime{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text2);text-align:right;}
+.header-right{display:flex;align-items:center;gap:24px;}
+.status-indicator{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent3);display:flex;align-items:center;}
+.stat-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:16px 20px;position:relative;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);}
+.stat-label{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--accent);line-height:1;text-shadow:0 0 15px rgba(0,212,255,0.4);}
+.stat-sub{font-size:11px;color:var(--text2);margin-top:4px;}
+.main-grid{display:grid;grid-template-columns:1fr 1fr 340px;gap:16px;margin-bottom:16px;}
+.panel{background:var(--panel);border:1px solid var(--border);}
+.panel-header{padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:rgba(0,212,255,0.03);}
+.panel-title{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:3px;color:var(--accent);}
+.panel-badge{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border:1px solid var(--border2);color:var(--text2);}
+.agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--border);}
+.agent-card{background:var(--panel);padding:16px;position:relative;cursor:pointer;}
+.agent-card:hover{background:var(--bg3);}
+.agent-card::after{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.agent-card.active::after{background:var(--accent3);}
+.agent-card.standby::after{background:var(--accent4);}
+.agent-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.agent-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;}
+.agent-status{font-family:'JetBrains Mono',monospace;font-size:8px;padding:2px 6px;}
+.status-active{color:var(--accent3);border:1px solid var(--accent3);}
+.status-standby{color:var(--accent4);border:1px solid var(--accent4);}
+.agent-role{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--accent);letter-spacing:2px;margin-bottom:6px;}
+.agent-task{font-size:12px;color:var(--text2);}
+.project-item{padding:14px 20px;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;}
+.project-item:hover{background:rgba(0,212,255,0.03);}
+.project-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;}
+.project-entity{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);}
+.project-phase{font-family:'JetBrains Mono',monospace;font-size:9px;padding:3px 8px;border:1px solid var(--border2);color:var(--text2);white-space:nowrap;}
+.phase-active{border-color:var(--accent3);color:var(--accent3);}
+.phase-overdue{border-color:var(--red);color:var(--red);}
+.phase-backend{border-color:var(--accent);color:var(--accent);}
+.phase-foundation{border-color:var(--text3);color:var(--text3);}
+.mcp-list{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.mcp-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);}
+.mcp-name{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text);}
+.mcp-info{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);margin-top:2px;}
+.mcp-ping{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--accent3);}
+.mcp-ping.down{color:var(--red);}
+.mcp-ping.warn{color:var(--accent4);}
+.bottom-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.entity-list{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.entity-item{padding:12px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent2);}
+.entity-item.hsc{border-left-color:var(--accent3);}
+.entity-item.legal{border-left-color:var(--accent4);}
+.entity-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.entity-detail{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);line-height:1.6;}
+.alert-list{padding:12px;display:flex;flex-direction:column;gap:8px;}
+.alert-item{padding:10px 12px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--red);font-size:12px;color:var(--text);}
+.alert-item.warn{border-left-color:var(--accent4);}
+.alert-item.info{border-left-color:var(--accent);}
+.alert-tag{font-family:'JetBrains Mono',monospace;font-size:8px;color:var(--text3);margin-bottom:4px;}
+.progress-bar{height:3px;background:var(--border);margin-top:8px;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));}
+.footer{margin-top:16px;padding:16px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.footer-left{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text3);letter-spacing:2px;}
+.footer-right{display:flex;gap:24px;}
+.footer-link{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--text2);text-decoration:none;}
+.footer-link:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="header">
+<div class="logo-area">
+<div class="logo-v"></div>
+<div><div class="logo-text">VBOARDER</div><div class="logo-sub">MISSION CONTROL · AI C-SUITE PLATFORM</div></div>
+</div>
+<div class="header-right">
+<div class="status-indicator"><span class="status-dot"></span>ALL SYSTEMS OPERATIONAL</div>
+<div class="datetime"><div id="date">MARCH 16, 2026</div><div id="time">21:00:00 MDT</div></div>
+</div>
+</div>
+<div class="stat-bar">
+<div class="stat-card"><div class="stat-label">Agents Online</div><div class="stat-value">9</div><div class="stat-sub">C-Suite Active</div></div>
+<div class="stat-card"><div class="stat-label">Active Projects</div><div class="stat-value">19</div><div class="stat-sub">Across 6 entities</div></div>
+<div class="stat-card"><div class="stat-label">MCP Server</div><div class="stat-value" style="color:var(--accent3)">V2.0</div><div class="stat-sub">Port 3002 · Live</div></div>
+<div class="stat-card"><div class="stat-label">GitHub Repos</div><div class="stat-value">7</div><div class="stat-sub">6 active · 1 archived</div></div>
+<div class="stat-card"><div class="stat-label">Open Brain</div><div class="stat-value">419</div><div class="stat-sub">Thoughts captured</div></div>
+</div>
+<div class="main-grid">
+<div class="panel">
+<div class="panel-header"><div class="panel-title">C-Suite Agents</div><div class="panel-badge">10 AGENTS</div></div>
+<div class="agents-grid">
+<div class="agent-card active"><div class="agent-top"><div class="agent-name">Victor Boarder</div><div class="agent-status status-active">ACTIVE</div></div><div class="agent-role">AI CO-FOUNDER / CTO</div><div class="agent-task">MCP toolchain · GitHub ops · Stack</div></div>
+<div class="agent-card active"><div class="agent-top"><div class="agent-name">Eva Moneypenny</div><div class="agent-status status-active">ACTIVE</div></div><div class="agent-role">EXEC SECRETARY / COS</div><div class="agent-task">Gmail · Calendar · Daily briefings</div></div>
+<div class="agent-card active"><div class="agent-top"><div class="agent-name">Christian Wolff</div><div class="agent-status status-active">ACTIVE</div></div><div class="agent-role">CFO</div><div class="agent-task">Q1 financials · API spend audit</div></div>
+<div class="agent-card standby"><div class="agent-top"><div class="agent-name">Joan Haris</div><div class="agent-status status-standby">STANDBY</div></div><div class="agent-role">CONTROLLER</div><div class="agent-task">HSC invoices · Reconciliation</div></div>
+<div class="agent-card standby"><div class="agent-top"><div class="agent-name">Alexandra Cross</div><div class="agent-status status-standby">STANDBY</div></div><div class="agent-role">CLO</div><div class="agent-task">Loric Homes legal · Agreements</div></div>
+<div class="agent-card active"><div class="agent-top"><div class="agent-name">Sophia</div><div class="agent-status status-active">ACTIVE</div></div><div class="agent-role">CKO</div><div class="agent-task">Knowledge base · Newsletter routing</div></div>
+<div class="agent-card standby"><div class="agent-top"><div class="agent-name">Troy Hale</div><div class="agent-status status-standby">NOT DEPLOYED</div></div><div class="agent-role">COO</div><div class="agent-task">Operations framework · Pending</div></div>
+<div class="agent-card active"><div class="agent-top"><div class="agent-name">Lil Lori</div><div class="agent-status status-active">ACTIVE</div></div><div class="agent-role">HSC AGENT</div><div class="agent-task">HSC staging · Lori field comms</div></div>
+<div class="agent-card standby"><div class="agent-top"><div class="agent-name">Adrian Vega</div><div class="agent-status status-standby">STANDBY</div></div><div class="agent-role">CMO</div><div class="agent-task">Marketing · Revenue activation</div></div>
+<div class="agent-card standby"><div class="agent-top"><div class="agent-name">Isabella Kane</div><div class="agent-status status-standby">STANDBY</div></div><div class="agent-role">CRO</div><div class="agent-task">Revenue ops · Client pipeline</div></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header"><div class="panel-title">Active Projects</div><div class="panel-badge">19 OPEN</div></div>
+<div class="project-list">
+<div class="project-item"><div><div class="project-name">C-Suite Agent Onboarding</div><div class="project-entity">VBOARDER · Victor</div></div><div class="project-phase phase-backend">FOUNDATION</div></div>
+<div class="project-item"><div><div class="project-name">VBoarder COCKPIT Build</div><div class="project-entity">VBOARDER · Victor</div></div><div class="project-phase phase-backend">BACKEND</div></div>
+<div class="project-item"><div><div class="project-name">Ubuntu Environment Optimization</div><div class="project-entity">VBOARDER · Victor</div></div><div class="project-phase phase-active">IN PROGRESS</div></div>
+<div class="project-item"><div><div class="project-name">RedLeg Wood Co. Board Foot Calc</div><div class="project-entity">CLIENT · Luis Luna</div></div><div class="project-phase phase-active">ACTIVE</div></div>
+<div class="project-item"><div><div class="project-name">D&amp;D Manor Operations</div><div class="project-entity">CLIENT · Eva</div></div><div class="project-phase phase-overdue">OVERDUE</div></div>
+<div class="project-item"><div><div class="project-name">Loric Homes Legal Review</div><div class="project-entity">LORIC · Alexandra</div></div><div class="project-phase phase-overdue">OVERDUE</div></div>
+<div class="project-item"><div><div class="project-name">Q1 Financial Reconciliation HSC</div><div class="project-entity">HSC · Christian</div></div><div class="project-phase phase-overdue">OVERDUE</div></div>
+<div class="project-item"><div><div class="project-name">HSC Website Optimization</div><div class="project-entity">HSC · Eva</div></div><div class="project-phase phase-foundation">BACKLOG</div></div>
+<div class="project-item"><div><div class="project-name">Corporate Entity Setup VBoarder AI</div><div class="project-entity">VBOARDER · Alexandra</div></div><div class="project-phase phase-foundation">BACKLOG</div></div>
+<div class="project-item"><div><div class="project-name">Lori PWA Field Ops Tool</div><div class="project-entity">HSC · Lil Lori</div></div><div class="project-phase phase-active">LIVE</div></div>
+<div class="project-item"><div><div class="project-name">Mission Control Dashboard</div><div class="project-entity">VBOARDER · Claude</div></div><div class="project-phase phase-active">LIVE</div></div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:16px;">
+<div class="panel">
+<div class="panel-header"><div class="panel-title">MCP Stack</div><div class="panel-badge">PORT 3002</div></div>
+<div class="mcp-list">
+<div class="mcp-item"><div><div class="mcp-name">real_mcp_server.py</div><div class="mcp-info">v2.0 · Gmail/Cal/Drive/Tasks</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">Open Brain MCP</div><div class="mcp-info">Supabase · 419 thoughts</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">Google Workspace MCP</div><div class="mcp-info">7 calendars wired</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">GitHub MCP</div><div class="mcp-info">EDilleHSC · 7 repos</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">Slack MCP</div><div class="mcp-info">vboarder.slack.com</div></div><div class="mcp-ping warn">⚠ PARTIAL</div></div>
+<div class="mcp-item"><div><div class="mcp-name">GCP EVA-RELAY-V3</div><div class="mcp-info">Account 01D4A4-667490</div></div><div class="mcp-ping down">✕ DOWN</div></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header"><div class="panel-title">GitHub Repos</div><div class="panel-badge">EDILLEHSC</div></div>
+<div class="mcp-list">
+<div class="mcp-item"><div><div class="mcp-name">vboarder-mcp-server</div><div class="mcp-info">private · @claude-fix ✓</div></div><div class="mcp-ping">● v2.0</div></div>
+<div class="mcp-item"><div><div class="mcp-name">vboarder-agents</div><div class="mcp-info">private · @claude-fix ✓</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">agent-configs</div><div class="mcp-info">public · 11 files</div></div><div class="mcp-ping">● LIVE</div></div>
+<div class="mcp-item"><div><div class="mcp-name">mission-control</div><div class="mcp-info">public · Vercel deploy</div></div><div class="mcp-ping">● LIVE</div></div>
+</div>
+</div>
+</div>
+</div>
+<div class="bottom-grid">
+<div class="panel">
+<div class="panel-header"><div class="panel-title">Active Entities</div><div class="panel-badge">6 ENTITIES</div></div>
+<div class="entity-list">
+<div class="entity-item"><div class="entity-name">VBoarder Inc</div><div class="entity-detail">CEO: Eric Dille · AI CTO: Victor Boarder<br>AI C-Suite platform for small business</div></div>
+<div class="entity-item hsc"><div class="entity-name">Home Stagers Choice</div><div class="entity-detail">Owner: Lori Kenny Dailing · Ops: Eric<br>Home staging + furniture rental · Est. Oct 2022</div></div>
+<div class="entity-item"><div class="entity-name">D&amp;D Manor</div><div class="entity-detail">Agent: Eva · Punchlist OVERDUE</div></div>
+<div class="entity-item legal"><div class="entity-name">Loric Homes &amp; Interiors</div><div class="entity-detail">Agent: Alexandra · Legal review OVERDUE</div></div>
+<div class="entity-item"><div class="entity-name">Loric Trading Desk</div><div class="entity-detail">Agent: Christian · NEW entity</div></div>
+<div class="entity-item hsc"><div class="entity-name">RedLeg Wood Co.</div><div class="entity-detail">Client: Luis Luna · Most urgent</div></div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header"><div class="panel-title">Open Flags</div><div class="panel-badge">7 ACTIVE</div></div>
+<div class="alert-list">
+<div class="alert-item"><div class="alert-tag">SECURITY</div>Revoke exposed Claude oat01 token</div>
+<div class="alert-item"><div class="alert-tag">BILLING</div>GCP terminated · Victor + Christian decision</div>
+<div class="alert-item warn"><div class="alert-tag">FINANCE</div>Slack Pro trial — 2 days left at 50% off</div>
+<div class="alert-item warn"><div class="alert-tag">DEPLOY</div>Vercel lori-pwa failed deployment</div>
+<div class="alert-item warn"><div class="alert-tag">GMAIL</div>47 drafts generating automatically</div>
+<div class="alert-item info"><div class="alert-tag">SECURITY</div>Vercel 2FA is OFF</div>
+<div class="alert-item info"><div class="alert-tag">SETUP</div>Obsidian vault not initialized</div>
+</div>
+</div>
+<div class="panel">
+<div class="panel-header"><div class="panel-title">Stack Status</div><div class="panel-badge">VBOARDER CORE</div></div>
+<div class="entity-list">
+<div class="entity-item" style="border-left-color:var(--accent3)"><div class="entity-name" style="color:var(--accent3)">✓ Confirmed Live</div><div class="entity-detail">Slack · Supabase · Vercel · LobeHub<br>MCP v2.0 · GitHub · Open Brain · Gmail</div></div>
+<div class="entity-item" style="border-left-color:var(--accent4)"><div class="entity-name" style="color:var(--accent4)">⚠ In Progress</div><div class="entity-detail">Obsidian · Little Lori SMS<br>Vercel mission-control · Gmail filters</div></div>
+<div class="entity-item" style="border-left-color:var(--text3)"><div class="entity-name" style="color:var(--text3)">○ Planned</div><div class="entity-detail">Goodshuffle MCP · Stripe · QuickBooks</div></div>
+<div class="entity-item" style="border-left-color:var(--accent)"><div class="entity-name">Trust Level — Week 1</div><div class="progress-bar"><div class="progress-fill" style="width:25%"></div></div></div>
+</div>
+</div>
+</div>
+<div class="footer">
+<div class="footer-left">VBOARDER INC · MISSION CONTROL v1.0 · COLORADO SPRINGS CO · AMERICA/DENVER</div>
+<div class="footer-right">
+<a class="footer-link" href="https://github.com/EDilleHSC" target="_blank">GITHUB</a>
+<a class="footer-link" href="https://vercel.com/edillehscs-projects" target="_blank">VERCEL</a>
+<a class="footer-link" href="https://vboarder.slack.com" target="_blank">SLACK</a>
+</div>
+</div>
+</div>
+<script>
+function updateTime(){
+const now=new Date();
+const opts={timeZone:'America/Denver',hour12:false};
+document.getElementById('time').textContent=now.toLocaleTimeString('en-US',{...opts,hour:'2-digit',minute:'2-digit',second:'2-digit'})+' MDT';
+document.getElementById('date').textContent=now.toLocaleDateString('en-US',{...opts,month:'long',day:'numeric',year:'numeric'}).toUpperCase();
+}
+updateTime();setInterval(updateTime,1000);
+</script>
+</body>
+</html>
